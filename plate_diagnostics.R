@@ -8,11 +8,17 @@
 
 ## questions can be addressed to m.muraro@hubrecht.eu
 
+# Setup ------------------------------------------------
+InputDir = "/Users/abelvertesy/Google_Drive/Spermatogenesis_Data/Count_tables/sp3/"
+
 ####install/load packages and variables####
 # install.packages("oce") # install this package upon first use
-source("~/AvO_lab/R/scripts/plate_diagnostics_functions2.R") # specify path to functions file
-require(RColorBrewer)
-require(oce)
+# source("https://raw.githubusercontent.com/vertesy/TheCorvinas/master/R/CodeAndRoll.R")
+source ('/Users/abelvertesy/Github_repos/TheCorvinas/R/CodeAndRoll.R')
+# source("https://raw.githubusercontent.com/vertesy/single-cell-sequencing/master/plate_diagnostics_functions.R"); 
+source("/Users/abelvertesy/Github_repos/scQC_Mauro/plate_diagnostics_functions.R")
+irequire(RColorBrewer)
+irequire(oce)
 
 # specify the location of your empty wells (follows primer number order)
 # if you don't have empty wells just specify O21-O24 and P21-P24.  
@@ -35,7 +41,7 @@ bc<-list() # list of .coutb files
 
 ####read files and lable cells ####
 #read data into four lists
-files <- read_files(dir = getwd()) # path to files with .cout* extention. NB: ALL files in the dir will be processed
+files <- read_files(dir = InputDir) # path to files with .cout* extention. NB: ALL files in the dir will be processed
 
 # read in files
 split_files <-sub(".*\\/","",files) 
@@ -43,9 +49,9 @@ for(i in 1:length(files)){
   names[[i]] <-  sub("\\_.*","",split_files[[i]]) # split lib name to keep only name supplied by you to cuppen group 
   cat("\n",split_files[[i]],"was renamed to",names[[i]],"\n",sep = " ") # fyi how the libraries will be named
   cat("reading .cout files for plate",i, "out of", length(files),"\n",sep = " ") # reports progress
-  tc[[i]] <- read.csv(paste(files[i],".coutt.csv", sep=""), header = TRUE, sep = "\t",row.names =1)
-  rc[[i]] <- read.csv(paste(files[i],".coutc.csv", sep=""), header = TRUE, sep = "\t",row.names =1) 
-  bc[[i]] <- read.csv(paste(files[i],".coutb.csv", sep=""), header = TRUE, sep = "\t",row.names =1)
+  tc[[i]] <- read.csv(paste(files[i],".TranscriptCounts.tsv", sep=""), header = TRUE, sep = "\t",row.names =1)
+  rc[[i]] <- read.csv(paste(files[i],".ReadCounts.tsv", sep=""), header = TRUE, sep = "\t",row.names =1) 
+  bc[[i]] <- read.csv(paste(files[i],".BarcodeCounts.tsv", sep=""), header = TRUE, sep = "\t",row.names =1)
   cat("library",names[[i]],"contains a total of",nrow(tc[[i]]),"genes") # reports number of genes found in each library
 }
 
@@ -55,10 +61,11 @@ for(i in 1:length(tc)){ colnames(tc[[i]])<-paste(names[[i]],c(1:384),sep="_") }
 # OPTIONAL: rename part of a specified plate if you have different experiments in one plate
 # do this only for one of the .coutt files at the time by choosing the correct location in the .coutt list (eg:tc[[5]])
 # and manually specify the names of the experiments (eg:"alpha"/"beta") and the cell labels (eg: 1:192), in total should be 384 cells.
-names(tc[[5]])<-c(paste("alpha",c(1:192),sep="_"),paste("beta",c(1:192),sep="_")) 
+# names(tc[[5]])<-c(paste("alpha",c(1:192),sep="_"),paste("beta",c(1:192),sep="_")) 
 
 #### diagnostic plots####
-path<-"/Users/mauro/Desktop/diagnostic plots/" # specify where you want the diagnostic plots
+try.dev.off()
+path<- InputDir # specify where you want the diagnostic plots
 dir.create(path, showWarnings = F) # directory will be made if it doesn't exist
 setwd(path)
 for(i in 1:length(tc)){

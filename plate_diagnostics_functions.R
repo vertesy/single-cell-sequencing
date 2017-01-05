@@ -228,26 +228,26 @@ read_files <- function(dir = "", name = Sys.Date()){
   }
   
   #Read files
-  files <- list.files(dir, ".cout(t|b|c).csv")
-  split <- strsplit(files,split = ".cout")
-  file_names <- unique(as.character(data.frame(split, stringsAsFactors = FALSE)[1,]))
+  files <- list.files(dir, "Counts.tsv")
+  split <- strsplit(files,split = ".(Barcode|Read|Transcript)Counts")
+  file_names <- unique(as.character(data.frame(split, stringsAsFactors = FALSE)[1,]));   # print(file_names)
   
   #This check if all necessary files are in the script
   error <- ""
   for(i in 1:length(file_names)){
     
-    if(file.exists(paste(dir, file_names[i],".coutb.csv", sep="")) == FALSE){
-      f <- paste(file_names[i], ".coutb.csv", " is not found!", sep = "")
+    if(file.exists(paste(dir, file_names[i],".BarcodeCounts.tsv", sep="")) == FALSE){
+      f <- paste(file_names[i], ".BarcodeCounts.tsv", " is not found!", sep = "")
       error <- paste(error, "\n", f)
     }
     
-    if(file.exists(paste(dir, file_names[i],".coutc.csv", sep="")) == FALSE){
-      f <- paste(file_names[i], ".coutc.csv", " is not found!", sep = "")
+    if(file.exists(paste(dir, file_names[i],".ReadCounts.tsv", sep="")) == FALSE){
+      f <- paste(file_names[i], ".ReadCounts.tsv", " is not found!", sep = "")
       error <- paste(error, "\n", f)
     }
     
-    if(file.exists(paste(dir,file_names[i],".coutt.csv", sep="")) == FALSE){
-      f <- paste(file_names[i], ".coutt.csv", " is not found!", sep = "")
+    if(file.exists(paste(dir,file_names[i],".TranscriptCounts.tsv", sep="")) == FALSE){
+      f <- paste(file_names[i], ".TranscriptCounts.tsv", " is not found!", sep = "")
       error <- paste(error, "\n", f)
     }
   }
@@ -257,10 +257,53 @@ read_files <- function(dir = "", name = Sys.Date()){
   }
   cat("the following plates will be processed:\n")
   print(file_names)
-
+  
   output <- paste(dir,file_names, sep="")
   return(output)
 }
+
+# #Read files in specified directory automatically (based on Thoms script)
+# read_files.Original <- function(dir = "", name = Sys.Date()){
+# 
+#   #add "/" to dir
+#   if(substr(dir, start = nchar(dir), stop = nchar(dir)) != "/" && dir != ""){
+#     dir <- paste(dir, "/", sep = "")
+#   }
+# 
+#   #Read files
+#   files <- list.files(dir, ".cout(t|b|c).csv")
+#   split <- strsplit(files,split = ".cout")
+#   file_names <- unique(as.character(data.frame(split, stringsAsFactors = FALSE)[1,]))
+# 
+#   #This check if all necessary files are in the script
+#   error <- ""
+#   for(i in 1:length(file_names)){
+# 
+#     if(file.exists(paste(dir, file_names[i],".coutb.csv", sep="")) == FALSE){
+#       f <- paste(file_names[i], ".coutb.csv", " is not found!", sep = "")
+#       error <- paste(error, "\n", f)
+#     }
+# 
+#     if(file.exists(paste(dir, file_names[i],".coutc.csv", sep="")) == FALSE){
+#       f <- paste(file_names[i], ".coutc.csv", " is not found!", sep = "")
+#       error <- paste(error, "\n", f)
+#     }
+# 
+#     if(file.exists(paste(dir,file_names[i],".coutt.csv", sep="")) == FALSE){
+#       f <- paste(file_names[i], ".coutt.csv", " is not found!", sep = "")
+#       error <- paste(error, "\n", f)
+#     }
+#   }
+# 
+#   if(error != ""){
+#     stop(error)
+#   }
+#   cat("the following plates will be processed:\n")
+#   print(file_names)
+# 
+#   output <- paste(dir,file_names, sep="")
+#   return(output)
+# }
 
 # check expression in empty corner of plate and calculate "leakyness" from highly expressed genes
 leakygenes<-function(data){
@@ -270,15 +313,15 @@ leakygenes<-function(data){
   genes.corner<-apply(rmspike(corner),2,function(x) sum(x>=1)) # remove ERCC reads
   spike.corner<-colSums(keepspike(corner)) # keep only ERCC reads
   genespike<-data.frame(genes=genes.corner,ERCC=spike.corner)
-  if(length(which(genes.corner > mean(genes/5))) != 0){
-    stop(paste("Not all 8 corner samples are empty in", names[[i]],": won't be plotted"))
-  } else {# check if the corner wells were actually empty, otherwise stop
-        # plot genes/cell and ERCC reads/cell for corner wells
-    par(mar = c(5, 4, 6, 1))
-    barplot(t(genespike),main="total genes and ERCCs \n in empty corner",
+  # if(length(which(genes.corner > mean(genes/5))) != 0){
+  #   stop(paste("Not all 8 corner samples are empty in", names[[i]],": won't be plotted"))
+  # } else {# check if the corner wells were actually empty, otherwise stop
+  # plot genes/cell and ERCC reads/cell for corner wells
+  par(mar = c(5, 4, 6, 1))
+  barplot(t(genespike),main="total genes and ERCCs \n in empty corner",
           col=c("blue","red"),space=rep(c(0.7,0),8),cex.names = 0.8,las=3,beside=TRUE,
           legend=colnames(genespike),args.legend = list(x = "topright", bty = "n",horiz=TRUE,inset=c(0,-0.25)))
-    }
+  # }
   # determine top expressed genes in corner and compare to mean expressed genes in plate
   if( length(which(spike.corner > 75)) == 0){
     stop(paste("There are no samples with more than 75 ERCC reads in", names[[i]]))
@@ -300,3 +343,42 @@ leakygenes<-function(data){
     barplot(log2(rev(non.overlap[1:length(non.overlap)])),las=1,cex.names = 0.6, main="top 50 empty corner genes \n not in top 200 plate genes", xlab="log2(mean expression)",horiz=TRUE)
   }
 }
+
+# # check expression in empty corner of plate and calculate "leakyness" from highly expressed genes
+# leakygenes.Original <-function(data){
+#   corner<-data[emptywells] # subset data to 8 wells specified in diagnotics script as empty corner
+#   names(corner)<-c("O21","O22","O23","O24","P21","P22","P23","P24")
+#   genes<-apply(data,2,function(x) sum(x>=1)) # check how many genes are detected
+#   genes.corner<-apply(rmspike(corner),2,function(x) sum(x>=1)) # remove ERCC reads
+#   spike.corner<-colSums(keepspike(corner)) # keep only ERCC reads
+#   genespike<-data.frame(genes=genes.corner,ERCC=spike.corner)
+#   if(length(which(genes.corner > mean(genes/5))) != 0){
+#     stop(paste("Not all 8 corner samples are empty in", names[[i]],": won't be plotted"))
+#   } else {# check if the corner wells were actually empty, otherwise stop
+#         # plot genes/cell and ERCC reads/cell for corner wells
+#     par(mar = c(5, 4, 6, 1))
+#     barplot(t(genespike),main="total genes and ERCCs \n in empty corner",
+#           col=c("blue","red"),space=rep(c(0.7,0),8),cex.names = 0.8,las=3,beside=TRUE,
+#           legend=colnames(genespike),args.legend = list(x = "topright", bty = "n",horiz=TRUE,inset=c(0,-0.25)))
+#     }
+#   # determine top expressed genes in corner and compare to mean expressed genes in plate
+#   if( length(which(spike.corner > 75)) == 0){
+#     stop(paste("There are no samples with more than 75 ERCC reads in", names[[i]]))
+#   }  
+#   cornerz<-corner[which(spike.corner>75)]  # take only wells which worked (>75 ERCC reads)
+#   cornerz<-rmspike(cornerz) # remove ERCCs
+#   mean.corner<-apply(cornerz,1,sum)[order(apply(cornerz,1,sum),decreasing=TRUE)][1:50] # pick top 50 in corner
+#   mean.all<-apply(data,1,sum)[order(apply(data,1,sum),decreasing=TRUE)][1:200] # pick top 200 in plate
+#   names(mean.corner)<-sapply(names(mean.corner),chop_chr) # remove __chr* from name
+#   names(mean.all)<-sapply(names(mean.all),chop_chr) # remove __chr* from name
+#   overlap<-mean.corner[names(mean.corner) %in% names(mean.all)] # check overal between top 50 corner and 200 in plate
+#   non.overlap<-mean.corner[!names(mean.corner) %in% names(mean.all)]
+#   b<-barplot(log2(rev(overlap[1:10])),las=1,cex.names = 0.6, main="top 10 overlapping genes",sub="barcode leaking in %", xlab="log2(sum of reads in corner)",horiz=TRUE)
+#   text(0.5,b, round((mean.corner[names(overlap)[1:10]]/mean.all[names(overlap)[1:10]])*100,2))
+#   if (length(overlap)==50){
+#     warning(paste("there is complete overlap between corner genes and plate genes in ", names[[i]]))
+#   }
+#   else{
+#     barplot(log2(rev(non.overlap[1:length(non.overlap)])),las=1,cex.names = 0.6, main="top 50 empty corner genes \n not in top 200 plate genes", xlab="log2(mean expression)",horiz=TRUE)
+#   }
+# }
