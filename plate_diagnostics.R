@@ -10,6 +10,7 @@
 
 # Setup ------------------------------------------------
 InputDir = "/Users/abelvertesy/Google_Drive/Spermatogenesis_Data/Count_tables/sp3/"
+MergedOutFile = paste0(InputDir,"TranscriptCounts.Merged.tsv")
 
 ####install/load packages and variables####
 # install.packages("oce") # install this package upon first use
@@ -90,6 +91,6 @@ for (i in 2:length(tc)){
 } # specify second position to last position you want to merge from-to
 cdata_all<- cdata_all[order(rownames(cdata_all)), ] #make row names alphabetical
 
-write.table(cdata_all,"/Users/mauro/AvO_lab/R/data files/DM23.csv", sep="\t") # this file can be loaded into RaceID
+write.table(cdata_all,MergedOutFile, sep="\t") # this file can be loaded into RaceID
 
 
