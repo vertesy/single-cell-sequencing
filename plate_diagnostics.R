@@ -14,12 +14,14 @@ MergedOutFile = paste0(InputDir,"TranscriptCounts.Merged.tsv")
 
 ####install/load packages and variables####
 # install.packages("oce") # install this package upon first use
-# source("https://raw.githubusercontent.com/vertesy/TheCorvinas/master/R/CodeAndRoll.R")
-source ('/Users/abelvertesy/Github_repos/TheCorvinas/R/CodeAndRoll.R')
-# source("https://raw.githubusercontent.com/vertesy/single-cell-sequencing/master/plate_diagnostics_functions.R"); 
-source("/Users/abelvertesy/Github_repos/scQC_Mauro/plate_diagnostics_functions.R")
+source("https://raw.githubusercontent.com/vertesy/TheCorvinas/master/R/CodeAndRoll.R")
+# source ('/Users/abelvertesy/Github_repos/TheCorvinas/R/CodeAndRoll.R')
+source("https://raw.githubusercontent.com/vertesy/single-cell-sequencing/master/plate_diagnostics_functions.R");
+# source("/Users/abelvertesy/Github_repos/scQC_Mauro/plate_diagnostics_functions.R")
 irequire(RColorBrewer)
 irequire(oce)
+
+MergeAndWriteOut = F #### merge and write multiple dataframes into one .tsv
 
 # specify the location of your empty wells (follows primer number order)
 # if you don't have empty wells just specify O21-O24 and P21-P24.  
@@ -84,13 +86,16 @@ for(i in 1:length(tc)){
   dev.off()
 } #make pdf with diagnostic plots
 
-####merge and write multiple dataframes into one .csv####
-cdata_all<-tc[[1]] # should be first position you want to start merging from
-for (i in 2:length(tc)){
-  cdata_all <- intersectmatrix(cdata_all,tc[[i]]) #  JC's function intersectmatrix
-} # specify second position to last position you want to merge from-to
-cdata_all<- cdata_all[order(rownames(cdata_all)), ] #make row names alphabetical
+if (MergeAndWriteOut) { #### merge and write multiple dataframes into one .tsv
+  "Currently incorrect: leaves spaces and parentheses in dimnames"
+  cdata_all<-tc[[1]] # should be first position you want to start merging from
+  for (i in 2:length(tc)){
+    cdata_all <- intersectmatrix(cdata_all,tc[[i]]) #  JC's function intersectmatrix
+  } # specify second position to last position you want to merge from-to
+  cdata_all<- cdata_all[order(rownames(cdata_all)), ] #make row names alphabetical
+  write.table(cdata_all,MergedOutFile, sep="\t") # this file can be loaded into RaceID
+}
 
-write.table(cdata_all,MergedOutFile, sep="\t") # this file can be loaded into RaceID
+
 
 
