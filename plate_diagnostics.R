@@ -9,7 +9,10 @@
 ## questions can be addressed to m.muraro@hubrecht.eu
 
 # Setup ------------------------------------------------
-InputDir = "/Users/abelvertesy/Google_Drive/Spermatogenesis_Data/Count_tables/sp3/"
+
+if(exists("InputDir")) print (InputDir) else {print("Define the variable InputDir before running this script"); stop()}
+# InputDir = "/Users/abelvertesy/Google_Drive/Spermatogenesis_Data/Count_tables/sp3/"
+# InputDir = "/Users/abelvertesy/Google_Drive/Spermatogenesis_Data/Count_tables/sp3/"
 MergedOutFile = paste0(InputDir,"TranscriptCounts.Merged.tsv")
 
 ####install/load packages and variables####
