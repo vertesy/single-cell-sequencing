@@ -83,12 +83,12 @@ intersectmatrix<-function(x,y){
 #overseq2, plot oversequencing per transcript
 overseq2 <- function(x,y){
   main=paste("oversequencing_molecules")   # mixes string + name of choice
-  xlab=bquote(log[10] ~ "read counts / barcode counts")    #  subscript in string
+  xlab=bquote(log[2] ~ "read counts / barcode counts")    #  subscript in string
   rc.v<-as.vector(unlist(x))[as.vector(unlist(x>0))]  
   bc.v<-as.vector(unlist(y))[as.vector(unlist(y>0))]
   results<-rc.v/bc.v
   sub=paste("median",round(median(rc.v/bc.v),3),sep=" ")
-  hist(log10(results),breaks=75, col="red", main=main,xlab=xlab,sub=sub)
+  hist(log2(results),breaks=75, col="red", main=main,xlab=xlab,sub=sub)
 }
 
 
@@ -324,24 +324,25 @@ leakygenes<-function(data){
   # }
   # determine top expressed genes in corner and compare to mean expressed genes in plate
   if( length(which(spike.corner > 75)) == 0){
-    stop(paste("There are no samples with more than 75 ERCC reads in", names[[i]]))
-  }  
-  cornerz<-corner[which(spike.corner>75)]  # take only wells which worked (>75 ERCC reads)
-  cornerz<-rmspike(cornerz) # remove ERCCs
-  mean.corner<-apply(cornerz,1,sum)[order(apply(cornerz,1,sum),decreasing=TRUE)][1:50] # pick top 50 in corner
-  mean.all<-apply(data,1,sum)[order(apply(data,1,sum),decreasing=TRUE)][1:200] # pick top 200 in plate
-  names(mean.corner)<-sapply(names(mean.corner),chop_chr) # remove __chr* from name
-  names(mean.all)<-sapply(names(mean.all),chop_chr) # remove __chr* from name
-  overlap<-mean.corner[names(mean.corner) %in% names(mean.all)] # check overal between top 50 corner and 200 in plate
-  non.overlap<-mean.corner[!names(mean.corner) %in% names(mean.all)]
-  b<-barplot(log2(rev(overlap[1:10])),las=1,cex.names = 0.6, main="top 10 overlapping genes",sub="barcode leaking in %", xlab="log2(sum of reads in corner)",horiz=TRUE)
-  text(0.5,b, round((mean.corner[names(overlap)[1:10]]/mean.all[names(overlap)[1:10]])*100,2))
-  if (length(overlap)==50){
-    warning(paste("there is complete overlap between corner genes and plate genes in ", names[[i]]))
-  }
-  else{
-    barplot(log2(rev(non.overlap[1:length(non.overlap)])),las=1,cex.names = 0.6, main="top 50 empty corner genes \n not in top 200 plate genes", xlab="log2(mean expression)",horiz=TRUE)
-  }
+    print(paste("WARNING: There are no samples with more than 75 ERCC reads in the O&P 20-24 corner of ", names[[i]]))
+  } else {
+    cornerz<-corner[which(spike.corner>75)]  # take only wells which worked (>75 ERCC reads)
+    cornerz<-rmspike(cornerz) # remove ERCCs
+    mean.corner<-apply(cornerz,1,sum)[order(apply(cornerz,1,sum),decreasing=TRUE)][1:50] # pick top 50 in corner
+    mean.all<-apply(data,1,sum)[order(apply(data,1,sum),decreasing=TRUE)][1:200] # pick top 200 in plate
+    names(mean.corner)<-sapply(names(mean.corner),chop_chr) # remove __chr* from name
+    names(mean.all)<-sapply(names(mean.all),chop_chr) # remove __chr* from name
+    overlap<-mean.corner[names(mean.corner) %in% names(mean.all)] # check overal between top 50 corner and 200 in plate
+    non.overlap<-mean.corner[!names(mean.corner) %in% names(mean.all)]
+    b<-barplot(log2(rev(overlap[1:10])),las=1,cex.names = 0.6, main="top 10 overlapping genes",sub="barcode leaking in %", xlab="log2(sum of reads in corner)",horiz=TRUE)
+    text(0.5,b, round((mean.corner[names(overlap)[1:10]]/mean.all[names(overlap)[1:10]])*100,2))
+    if (length(overlap)==50){
+      warning(paste("there is complete overlap between corner genes and plate genes in ", names[[i]]))
+    }
+    else{
+      barplot(log2(rev(non.overlap[1:length(non.overlap)])),las=1,cex.names = 0.6, main="top 50 empty corner genes \n not in top 200 plate genes", xlab="log2(mean expression)",horiz=TRUE)
+    }
+  } # if not enough SpikeIns
 }
 
 # # check expression in empty corner of plate and calculate "leakyness" from highly expressed genes
