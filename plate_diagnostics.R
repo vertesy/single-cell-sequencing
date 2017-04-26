@@ -10,24 +10,24 @@
 
 # Setup ------------------------------------------------
 
-InputDir = "/Users/abelvertesy/Google_Drive/Spermatogenesis_Data/Count_tables_MapNGo2/sp4/"
-# InputDir = "/Users/abelvertesy/Google_Drive/Spermatogenesis_Data/Count_tables_MapNGo2/sp3/"
+InputDir = "~/Google_Drive/Spermatogenesis_Data/Count_tables_MapNGo2/sp4/"
+# InputDir = "~/Google_Drive/Spermatogenesis_Data/Count_tables_MapNGo2/sp3/"
 if(exists("InputDir")) print (InputDir) else {print("Define the variable InputDir before running this script"); stop()}
 MergedOutFile = paste0(InputDir,"TranscriptCounts.Merged.tsv")
 
 ####install/load packages and variables####
 # install.packages("oce") # install this package upon first use
 source("https://raw.githubusercontent.com/vertesy/TheCorvinas/master/R/CodeAndRoll.R")
-# source ('/Users/abelvertesy/Github_repos/TheCorvinas/R/CodeAndRoll.R')
+# source ('~/Github_repos/TheCorvinas/R/CodeAndRoll.R')
 # source("https://raw.githubusercontent.com/vertesy/single-cell-sequencing/master/plate_diagnostics_functions.R");
-source("/Users/abelvertesy/Github_repos/_Others/scQC_Mauro/plate_diagnostics_functions.R")
+source("~/Github_repos/_Others/scQC_Mauro/plate_diagnostics_functions.R")
 irequire(RColorBrewer)
 irequire(oce)
 
 MergeAndWriteOut = F #### merge and write multiple dataframes into one .tsv
 
 # specify the location of your empty wells (follows primer number order)
-# if you don't have empty wells just specify O21-O24 and P21-P24.  
+# if you don't have empty wells just specify O21-O24 and P21-P24.
 emptywells<-c(357:360,381:384) # this corresponds to O21-O24 and P21-P24
 
 #variables for the script
@@ -50,13 +50,13 @@ bc<-list() # list of .coutb files
 files <- read_files(dir = InputDir) # path to files with .cout* extention. NB: ALL files in the dir will be processed
 
 # read in files
-split_files <-sub(".*\\/","",files) 
+split_files <-sub(".*\\/","",files)
 for(i in 1:length(files)){
-  names[[i]] <-  sub("\\_.*","",split_files[[i]]) # split lib name to keep only name supplied by you to cuppen group 
+  names[[i]] <-  sub("\\_.*","",split_files[[i]]) # split lib name to keep only name supplied by you to cuppen group
   cat("\n",split_files[[i]],"was renamed to",names[[i]],"\n",sep = " ") # fyi how the libraries will be named
   cat("reading .cout files for plate",i, "out of", length(files),"\n",sep = " ") # reports progress
   tc[[i]] <- read.csv(paste(files[i],".TranscriptCounts.tsv", sep=""), header = TRUE, sep = "\t",row.names =1)
-  rc[[i]] <- read.csv(paste(files[i],".ReadCounts.tsv", sep=""), header = TRUE, sep = "\t",row.names =1) 
+  rc[[i]] <- read.csv(paste(files[i],".ReadCounts.tsv", sep=""), header = TRUE, sep = "\t",row.names =1)
   bc[[i]] <- read.csv(paste(files[i],".BarcodeCounts.tsv", sep=""), header = TRUE, sep = "\t",row.names =1)
   cat("library",names[[i]],"contains a total of",nrow(tc[[i]]),"genes") # reports number of genes found in each library
 }
@@ -67,7 +67,7 @@ for(i in 1:length(tc)){ colnames(tc[[i]])<-paste(names[[i]],c(1:384),sep="_") }
 # OPTIONAL: rename part of a specified plate if you have different experiments in one plate
 # do this only for one of the .coutt files at the time by choosing the correct location in the .coutt list (eg:tc[[5]])
 # and manually specify the names of the experiments (eg:"alpha"/"beta") and the cell labels (eg: 1:192), in total should be 384 cells.
-# names(tc[[5]])<-c(paste("alpha",c(1:192),sep="_"),paste("beta",c(1:192),sep="_")) 
+# names(tc[[5]])<-c(paste("alpha",c(1:192),sep="_"),paste("beta",c(1:192),sep="_"))
 
 #### diagnostic plots####
 try.dev.off()
@@ -76,7 +76,7 @@ dir.create(path, showWarnings = F) # directory will be made if it doesn't exist
 setwd(path)
 for(i in 1:length(tc)){
   pdf(paste(names[[i]],"_plate_diagnostics",".pdf",sep=""))
-  par(mfrow = c(3,3)) # specify grid for plots on the pdf 
+  par(mfrow = c(3,3)) # specify grid for plots on the pdf
   totalreads(tc[[i]],plotmethod = "hist") # plots total UMI reads/cell, can choose 4 different plot methods
   cellgenes(tc[[i]],plotmethod= "cumulative") # plot number of detected genes/cell, can choose 4 different plot methods
   overseq2(rc[[i]],bc[[i]]) # plot oversequencing per molecule
