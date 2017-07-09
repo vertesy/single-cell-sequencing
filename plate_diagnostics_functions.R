@@ -35,16 +35,16 @@ reorder.cs1<-function(libraries,name){
   rc<-list()
   bc<-list()
   for(i in 1:4){
-    tc[[i]]<-  read.csv(paste(libraries[i],".coutt.csv", sep=""), header = TRUE, sep = "\t",row.names =1)
-    rc[[i]] <- read.csv(paste(libraries[i],".coutc.csv", sep=""), header = TRUE, sep = "\t",row.names =1) 
-    bc[[i]] <- read.csv(paste(libraries[i],".coutb.csv", sep=""), header = TRUE, sep = "\t",row.names =1)
+    tc[[i]]<-  read.csv(paste(libraries[i],".TranscriptCounts.tsv", sep=""), header = TRUE, sep = "\t",row.names =1)
+    bc[[i]] <- read.csv(paste(libraries[i],".BarcodeCounts.tsv", sep=""), header = TRUE, sep = "\t",row.names =1)
+    rc[[i]] <- read.csv(paste(libraries[i],".ReadCounts.tsv", sep=""), header = TRUE, sep = "\t",row.names =1)
   }
   merge.tc<-intersectmatrix(tc[[1]],intersectmatrix(tc[[2]],intersectmatrix(tc[[3]],tc[[4]])))
   merge.bc<-intersectmatrix(bc[[1]],intersectmatrix(bc[[2]],intersectmatrix(bc[[3]],bc[[4]])))
   merge.rc<-intersectmatrix(rc[[1]],intersectmatrix(rc[[2]],intersectmatrix(rc[[3]],rc[[4]])))
-
-  order<-c(matrix(c(96*0+seq(1,96), 96*1+seq(1,96)), 2, byrow = T)) 
-  order2<-c(matrix(c(96*2+seq(1,96), 96*3+seq(1,96)), 2, byrow = T)) 
+  
+  order<-c(matrix(c(96*0+seq(1,96), 96*1+seq(1,96)), 2, byrow = T))
+  order2<-c(matrix(c(96*2+seq(1,96), 96*3+seq(1,96)), 2, byrow = T))
   all<-c()
   for(i in 0:7){
     all<-c(all,order[(1+i*24):((i+1)*24)],order2[(1+i*24):((i+1)*24)])
@@ -57,10 +57,12 @@ reorder.cs1<-function(libraries,name){
   merge.order.bc<- merge.order.bc[order(rownames( merge.order.bc)), ]
   merge.order.rc<- merge.order.rc[order(rownames( merge.order.rc)), ]
   
-  write.table(merge.order.tc,paste(name,".coutt.csv",sep=""),sep="\t")
-  write.table(merge.order.bc,paste(name,".coutb.csv",sep=""),sep="\t")
-  write.table(merge.order.rc,paste(name,".coutc.csv",sep=""),sep="\t")
+  write.table(merge.order.tc,paste(name,".TranscriptCounts.tsv",sep=""),sep="\t")
+  write.table(merge.order.bc,paste(name,".BarcodeCounts.tsv",sep=""),sep="\t")
+  write.table(merge.order.rc,paste(name,".ReadCounts.tsv",sep=""),sep="\t")
 }
+
+
 
 #JC's merge function (produces new rows on bottom of new dataframe, so reorder rows alphabetically afterwards)
 intersectmatrix<-function(x,y){

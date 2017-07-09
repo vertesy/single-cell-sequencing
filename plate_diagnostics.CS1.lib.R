@@ -8,6 +8,11 @@
 
 ## questions can be addressed to m.muraro@hubrecht.eu
 
+# Parameters ------------------------------------------------
+
+MergeAndWriteOut = F #### merge and write multiple dataframes into one .tsv
+Use_CS1_libaries = T
+
 # Setup ------------------------------------------------
 
 # InputDir = "~/Google_Drive/Spermatogenesis_Data/Count_tables_MapNGo2/sp4/"
@@ -24,8 +29,6 @@ source("~/Github_repos/_Others/scQC_Mauro/plate_diagnostics_functions.R")
 irequire(RColorBrewer)
 irequire(oce)
 
-MergeAndWriteOut = F #### merge and write multiple dataframes into one .tsv
-
 # specify the location of your empty wells (follows primer number order)
 # if you don't have empty wells just specify O21-O24 and P21-P24.
 emptywells<-c(357:360,381:384) # this corresponds to O21-O24 and P21-P24
@@ -38,12 +41,19 @@ rc<-list() # list of .coutc files
 bc<-list() # list of .coutb files
 
 #### OPTIONAL: Merge CS1-type libraries into one 384-column long CS2-type file####
-# do this ONLY if you have CS1-style (4 libraries in one plate) data that you want to run this script on
-# this assumes the order of A1=lib1, A2=lib2, B1=lib3, B2=lib4 when it reorders the columns
-# setwd("/Users/mauro/AvO_lab/R/GK_GateID/raw_files/GK2E_GK2F/") # set directory containing the files
-# CS1files <- read_files(dir = getwd()) # lists all the unique library names in the working directory
-# input required is 4 unique library handles in the right order, followed by the name of the new, merged file, like so:
-# reorder.cs1(c("EP10-12-1_AHVK72BGXX_S1","EP10-12-2_AHVK72BGXX_S2","EP10-12-3_AHVK72BGXX_S3","EP10-12-4_AHVK72BGXX_S4"),"EP10-CS2-live")
+if (Use_CS1_libaries) {
+  # do this ONLY if you have CS1-style (4 libraries in one plate) data that you want to run this script on
+  # this assumes the order of A1=lib1, A2=lib2, B1=lib3, B2=lib4 when it reorders the columns
+  setwd(InputDir) # set directory containing the files
+  CS1files <- read_files(dir = getwd()) # lists all the unique library names in the working directory
+  # input required is 4 unique library handles in the right order, followed by the name of the new, merged file, like so:
+  
+  InputNames = list.files(path = InputDir,pattern = "*.TranscriptCounts.tsv")
+  InputNames = stringr::str_split_fixed(InputNames, pattern = "\\.", n=2)[,1] # remove ending
+  OutputName = "HPE.02"
+  reorder.cs1(InputNames, OutputName)
+} #if`
+
 
 ####read files and label cells ####
 #read data into four lists
