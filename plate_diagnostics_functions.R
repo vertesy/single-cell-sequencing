@@ -44,7 +44,9 @@ reorder.cs1<-function(libraries,name){
   merge.rc<-intersectmatrix(rc[[1]],intersectmatrix(rc[[2]],intersectmatrix(rc[[3]],rc[[4]])))
   
   order<-c(matrix(c(96*0+seq(1,96), 96*1+seq(1,96)), 2, byrow = T))
+  "This order is completely wrong:  1  97   2  98   3  99 "
   order2<-c(matrix(c(96*2+seq(1,96), 96*3+seq(1,96)), 2, byrow = T))
+  "I am not sure about this order either 193 289 194 290 195 291 196 292 197 293 19"
   all<-c()
   for(i in 0:7){
     all<-c(all,order[(1+i*24):((i+1)*24)],order2[(1+i*24):((i+1)*24)])

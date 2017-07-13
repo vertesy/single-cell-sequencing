@@ -11,19 +11,21 @@
 # Parameters ------------------------------------------------
 
 MergeAndWriteOut = F #### merge and write multiple dataframes into one .tsv
-Use_CS1_libaries = T
+Use_CS1_libaries = F
+# InputDir = "~/Google_Drive/Spermatogenesis_Data/Count_tables_MapNGo2/sp4/"
+InputDir = "/Users/abelvertesy/Google_Drive/Avano/HPE/Data/hpe2/mRNA/count_files/Merged"
+
+
 
 # Setup ------------------------------------------------
-
-# InputDir = "~/Google_Drive/Spermatogenesis_Data/Count_tables_MapNGo2/sp4/"
-InputDir = "/Users/abelvertesy/Google_Drive/Avano/HPE/Data/hpe2/mRNA/count_files/"
 if(exists("InputDir")) print (InputDir) else {print("Define the variable InputDir before running this script"); stop()}
 MergedOutFile = paste0(InputDir,"TranscriptCounts.Merged.tsv")
+setwd(InputDir)
 
 ####install/load packages and variables####
 # install.packages("oce") # install this package upon first use
-source("https://raw.githubusercontent.com/vertesy/TheCorvinas/master/R/CodeAndRoll.R")
-# source ('~/Github_repos/TheCorvinas/R/CodeAndRoll.R')
+# source("https://raw.githubusercontent.com/vertesy/TheCorvinas/master/R/CodeAndRoll.R")
+source ('~/Github_repos/TheCorvinas/R/CodeAndRoll.R')
 # source("https://raw.githubusercontent.com/vertesy/single-cell-sequencing/master/plate_diagnostics_functions.R");
 source("~/Github_repos/_Others/scQC_Mauro/plate_diagnostics_functions.R")
 irequire(RColorBrewer)
@@ -99,6 +101,7 @@ for(i in 1:length(tc)){
   dev.off()
 } #make pdf with diagnostic plots
 
+
 if (MergeAndWriteOut) { #### merge and write multiple dataframes into one .tsv
   "Currently incorrect: leaves spaces and parentheses in dimnames"
   cdata_all<-tc[[1]] # should be first position you want to start merging from
@@ -110,5 +113,4 @@ if (MergeAndWriteOut) { #### merge and write multiple dataframes into one .tsv
 }
 
 
-
-
+try.dev.off()
