@@ -13,7 +13,7 @@
 MergeAndWriteOut = F #### merge and write multiple dataframes into one .tsv
 Use_CS1_libaries = F
 # InputDir = "~/Google_Drive/Spermatogenesis_Data/Count_tables_MapNGo2/sp4/"
-InputDir = "/Users/abelvertesy/Google_Drive/Avano/HPE/Data/hpe2/mRNA/count_files/Merged"
+InputDir = "~/Google_Drive/Avano/HPE/Data/hpe2/mRNA/count_files/Merged"
 
 
 
@@ -49,7 +49,7 @@ if (Use_CS1_libaries) {
   setwd(InputDir) # set directory containing the files
   CS1files <- read_files(dir = getwd()) # lists all the unique library names in the working directory
   # input required is 4 unique library handles in the right order, followed by the name of the new, merged file, like so:
-  
+
   InputNames = list.files(path = InputDir,pattern = "*.TranscriptCounts.tsv")
   InputNames = stringr::str_split_fixed(InputNames, pattern = "\\.", n=2)[,1] # remove ending
   OutputName = "HPE.02"

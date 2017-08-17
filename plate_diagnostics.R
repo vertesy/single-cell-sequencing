@@ -10,15 +10,16 @@
 
 # Setup ------------------------------------------------
 
-# InputDir = "~/Google_Drive/Spermatogenesis_Data/Count_tables_MapNGo2/sp4/"
-InputDir = "/Users/abelvertesy/Google_Drive/Avano/HPE/Data/hpe2/mRNA/count_files/"
+InputDir = "/Users/abelvertesy/Google_Drive/Avano/INT/Data/INT07/"
+# InputDir = "~/Google_Drive/Avano/HPE/Data/hpe2/mRNA/count_files/"
 if(exists("InputDir")) print (InputDir) else {print("Define the variable InputDir before running this script"); stop()}
 MergedOutFile = paste0(InputDir,"TranscriptCounts.Merged.tsv")
 
 ####install/load packages and variables####
 # install.packages("oce") # install this package upon first use
-source("https://raw.githubusercontent.com/vertesy/TheCorvinas/master/R/CodeAndRoll.R")
-# source ('~/Github_repos/TheCorvinas/R/CodeAndRoll.R')
+# source("https://raw.githubusercontent.com/vertesy/TheCorvinas/master/R/CodeAndRoll.R")
+source ('~/Github_repos/TheCorvinas/R/CodeAndRoll.R')
+
 # source("https://raw.githubusercontent.com/vertesy/single-cell-sequencing/master/plate_diagnostics_functions.R");
 source("~/Github_repos/_Others/scQC_Mauro/plate_diagnostics_functions.R")
 irequire(RColorBrewer)
@@ -30,12 +31,11 @@ MergeAndWriteOut = F #### merge and write multiple dataframes into one .tsv
 # if you don't have empty wells just specify O21-O24 and P21-P24.
 emptywells<-c(357:360,381:384) # this corresponds to O21-O24 and P21-P24
 
+
 #variables for the script
 names<-list() # for the shortened names of the libraries
 split_files<-list() # for  full names of the plates without .cout* extension
-tc<-list() # list of .coutt files
-rc<-list() # list of .coutc files
-bc<-list() # list of .coutb files
+bc <- rc <- tc <- list() # list of .coutt, .coutc, .coutb files
 
 #### OPTIONAL: Merge CS1-type libraries into one 384-column long CS2-type file####
 # do this ONLY if you have CS1-style (4 libraries in one plate) data that you want to run this script on
@@ -55,9 +55,9 @@ for(i in 1:length(files)){
   names[[i]] <-  sub("\\_.*","",split_files[[i]]) # split lib name to keep only name supplied by you to cuppen group
   cat("\n",split_files[[i]],"was renamed to",names[[i]],"\n",sep = " ") # fyi how the libraries will be named
   cat("reading .cout files for plate",i, "out of", length(files),"\n",sep = " ") # reports progress
-  tc[[i]] <- read.csv(paste(files[i],".TranscriptCounts.tsv", sep=""), header = TRUE, sep = "\t",row.names =1)
-  rc[[i]] <- read.csv(paste(files[i],".ReadCounts.tsv", sep=""), header = TRUE, sep = "\t",row.names =1)
-  bc[[i]] <- read.csv(paste(files[i],".BarcodeCounts.tsv", sep=""), header = TRUE, sep = "\t",row.names =1)
+  tc[[i]] <- read.csv(paste(files[i],".TranscriptCounts.tsv.gz", sep=""), header = TRUE, sep = "\t",row.names =1)
+  rc[[i]] <- read.csv(paste(files[i],".ReadCounts.tsv.gz", sep=""), header = TRUE, sep = "\t",row.names =1)
+  bc[[i]] <- read.csv(paste(files[i],".BarcodeCounts.tsv.gz", sep=""), header = TRUE, sep = "\t",row.names =1)
   cat("library",names[[i]],"contains a total of",nrow(tc[[i]]),"genes") # reports number of genes found in each library
 }
 
@@ -86,7 +86,7 @@ for(i in 1:length(tc)){
   # leakygenes plots (1): numer of genes and ERCC reads in the empty corner. Will give warning if a sample has more than plate average genes/5
   # (2): top expressed genes in the empty corner and % of their total reads in empty corner compared to total reads in whole plate.
   # (3): any genes that are in the top 50 genes in empty corner, but not in the top 200 genes in rest of plate (likely artifacts)
-  dev.off()
+  try.dev.off()
 } #make pdf with diagnostic plots
 
 if (MergeAndWriteOut) { #### merge and write multiple dataframes into one .tsv
@@ -100,5 +100,4 @@ if (MergeAndWriteOut) { #### merge and write multiple dataframes into one .tsv
 }
 
 
-
-
+try.dev.off()
