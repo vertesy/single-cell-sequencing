@@ -3,9 +3,11 @@
 #remove or keep only spike ins from given data frame
 rmspike<-function(x){
   ERCCs<-grep("ERCC-",row.names(x)) # gives vector with row # of spike ins
-  data<-x[-ERCCs,] # make new data frame without the specified rows
+  condition = F
+  if (l(ERCCs)) data<-x[-ERCCs,] # make new data frame without the specified rows
   return(data) # output new data frame
 }
+
 keepspike<-function(x){
   ERCCs<-grep("ERCC-",row.names(x)) # gives vector with row # of spike ins
   data<-x[ERCCs,] # make new data frame with only the specified rows
@@ -42,7 +44,7 @@ reorder.cs1<-function(libraries,name){
   merge.tc<-intersectmatrix(tc[[1]],intersectmatrix(tc[[2]],intersectmatrix(tc[[3]],tc[[4]])))
   merge.bc<-intersectmatrix(bc[[1]],intersectmatrix(bc[[2]],intersectmatrix(bc[[3]],bc[[4]])))
   merge.rc<-intersectmatrix(rc[[1]],intersectmatrix(rc[[2]],intersectmatrix(rc[[3]],rc[[4]])))
-  
+
   order<-c(matrix(c(96*0+seq(1,96), 96*1+seq(1,96)), 2, byrow = T))
   "This order is completely wrong:  1  97   2  98   3  99 "
   order2<-c(matrix(c(96*2+seq(1,96), 96*3+seq(1,96)), 2, byrow = T))
@@ -54,11 +56,11 @@ reorder.cs1<-function(libraries,name){
   merge.order.tc<-merge.tc[all]
   merge.order.bc<-merge.bc[all]
   merge.order.rc<-merge.rc[all]
-  
+
   merge.order.tc<- merge.order.tc[order(rownames( merge.order.tc)), ]
   merge.order.bc<- merge.order.bc[order(rownames( merge.order.bc)), ]
   merge.order.rc<- merge.order.rc[order(rownames( merge.order.rc)), ]
-  
+
   write.table(merge.order.tc,paste(name,".TranscriptCounts.tsv",sep=""),sep="\t")
   write.table(merge.order.bc,paste(name,".BarcodeCounts.tsv",sep=""),sep="\t")
   write.table(merge.order.rc,paste(name,".ReadCounts.tsv",sep=""),sep="\t")
@@ -88,7 +90,7 @@ intersectmatrix<-function(x,y){
 overseq2 <- function(x,y){
   main=paste("oversequencing_molecules")   # mixes string + name of choice
   xlab=bquote(log[2] ~ "read counts / barcode counts")    #  subscript in string
-  rc.v<-as.vector(unlist(x))[as.vector(unlist(x>0))]  
+  rc.v<-as.vector(unlist(x))[as.vector(unlist(x>0))]
   bc.v<-as.vector(unlist(y))[as.vector(unlist(y>0))]
   results<-rc.v/bc.v
   sub=paste("median",round(median(rc.v/bc.v),3),sep=" ")
@@ -100,27 +102,27 @@ overseq2 <- function(x,y){
 totalreads <- function(data,plotmethod=c("barplot","hist","cumulative","combo")){
   if ( ! plotmethod %in% c("barplot","hist","cumulative","combo") ) stop("invalid method")
   if(plotmethod == "hist"){
-    a<-hist(log10(colSums(data)),breaks=100,xlab="log10(counts)",ylab="frequency",main="total unique reads",col="grey",xaxt="n",col.sub="red") 
+    a<-hist(log10(colSums(data)),breaks=100,xlab="log10(counts)",ylab="frequency",main="total unique reads",col="grey",xaxt="n",col.sub="red")
     mtext(paste("mean:",round(mean(colSums(data)))," median:",round(median(colSums(data)))),side=3,col="red",cex=0.8)
     axis(1,at=a$breaks[which(a$breaks %in% seq(0,max(a$breaks),1))],labels=a$breaks[which(a$breaks %in% c(0,1,2,3,4,5))])
     axis(1,at=a$breaks[which(a$breaks %in% seq(0,max(a$breaks),1000))],labels=a$breaks[which(a$breaks %in% seq(0,max(a$breaks),1000))])
-    
+
     abline(v=log10(mean(colSums(data))/2),col="red")
     text(log10(mean(colSums(data))/2),max(a$counts)-2, round(mean(colSums(data))/2), srt=0.2, col = "red",pos=2)
   }
   if(plotmethod == "barplot"){
-    b<-barplot(colSums(data),xaxt="n",xlab="cells",sub=paste("mean total read:",round(mean(colSums(data)))),main="total unique reads",col="black",border=NA) 
+    b<-barplot(colSums(data),xaxt="n",xlab="cells",sub=paste("mean total read:",round(mean(colSums(data)))),main="total unique reads",col="black",border=NA)
     axis(1,at=b,labels=c(1:length(data))) # 1=horizontal at = position of marks
     abline(h=mean(colSums(data)),col="red")
   }
   if(plotmethod == "cumulative"){
-    plot(ecdf(colSums(data)),xlab="total reads",ylab="fraction",main="total unique reads",col="red",tck=1,pch=19,cex=0.5,cex.axis=0.8) 
+    plot(ecdf(colSums(data)),xlab="total reads",ylab="fraction",main="total unique reads",col="red",tck=1,pch=19,cex=0.5,cex.axis=0.8)
     abline(v=mean(colSums(data)/2),col="red")
     mtext(paste("mean:",round(mean(colSums(data)))," median:",round(median(colSums(data)))),side=3,col="red",cex=0.8)
   }
-  
+
   if(plotmethod == "combo"){
-    a<-hist(log10(colSums(data)),breaks=100,xlab="log10(counts)",ylab="frequency",main="total unique reads",col="grey",xaxt="n",col.sub="red") 
+    a<-hist(log10(colSums(data)),breaks=100,xlab="log10(counts)",ylab="frequency",main="total unique reads",col="grey",xaxt="n",col.sub="red")
     mtext(paste("mean:",round(mean(colSums(data)))," median:",round(median(colSums(data)))),side=3,col="red",cex=0.8)
     axis(1,at=a$breaks[which(a$breaks %in% c(0,1,2,3,4,5))],labels=a$breaks[which(a$breaks %in% c(0,1,2,3,4,5))])
     abline(v=log10(mean(colSums(data))/2),col="red")
@@ -137,7 +139,7 @@ cellgenes<-function(data,plotmethod=c("hist","cumulative","combo")){
   if ( ! plotmethod %in% c("hist","cumulative","combo") ) stop("invalid plotting method")
     genes<-apply(data,2,function(x) sum(x>=1))
   if(plotmethod == "hist"){
-    a<-hist(genes,breaks=100,xlab="total genes",ylab="frequency",main="detected genes/cell",col="steelblue1",xaxt="n") 
+    a<-hist(genes,breaks=100,xlab="total genes",ylab="frequency",main="detected genes/cell",col="steelblue1",xaxt="n")
     mtext(paste("mean:",round(mean(genes))," median:",round(median(genes))),side=3,col="red",cex=0.8)
     axis(1,at=a$breaks[which(a$breaks %in% seq(0,max(a$breaks),1000))],labels=a$breaks[which(a$breaks %in% seq(0,max(a$breaks),1000))])
   }
@@ -146,7 +148,7 @@ cellgenes<-function(data,plotmethod=c("hist","cumulative","combo")){
     mtext(paste("mean:",round(mean(genes))," median:",round(median(genes))),side=3,col="red",cex=0.8)
   }
   if(plotmethod == "combo"){
-    a<-hist(genes,breaks=100,xlab="log10(counts)",ylab="frequency",main="detected genes/cell",col="steelblue1",xaxt="n") 
+    a<-hist(genes,breaks=100,xlab="log10(counts)",ylab="frequency",main="detected genes/cell",col="steelblue1",xaxt="n")
     mtext(paste("mean:",round(mean(genes))," median:",round(median(genes))),side=3,col="red",cex=0.8)
     axis(1,at=a$breaks[which(a$breaks %in% seq(0,max(a$breaks),1000))],labels=a$breaks[which(a$breaks %in% seq(0,max(a$breaks),1000))])
     plotInset(max(genes)/3,max(a$counts)/3,max(genes), max(a$counts),mar=c(1,1,1,1),
@@ -174,7 +176,7 @@ testcutoff<-function(data,n,pdf=FALSE){
     }
   }
   if (pdf){
-    pdf(paste(getwd(),main,".pdf",sep="")) 
+    pdf(paste(getwd(),main,".pdf",sep=""))
     plot(apply(rc.cutoff,2,sum),ylab = "number of transcripts",col="black",
     xlab = "cutoff (mean transcript no.)",main=main,type="b",lty=2,pch=19)
     dev.off()
@@ -182,9 +184,9 @@ testcutoff<-function(data,n,pdf=FALSE){
   else{
     plot(apply(rc.cutoff,2,sum),ylab = "number of transcripts",col="black",
     xlab = "cutoff (mean transcript no.)",main=main,type="b",lty=2,pch=19)
-  }    
+  }
 }
-    
+
 
 #plot number of total reads, ERCC-reads and genes/cell over a 384-well plate layout
 plate.plots<-function(data){
@@ -201,11 +203,11 @@ plate.plots<-function(data){
   plot(expand.grid(x = c(1:24), y = c(1:16)),main="sum of all ERCCs",ylab=NA,xlab=NA) #plate layout
   points(coordinates,pch=19,col=palette[cut(log10(spike),10)]) #plot sum of spike ins over plate
   mtext(paste(">100 ERCCs :",round(length(which(colSums(keepspike(data))>100))/384*100),"%"),col="red",cex=0.9)
-  
-  plot(expand.grid(x = c(1:24), y = c(1:16)),main="sum ERCC/sum non ERCC reads",ylab=NA,xlab=NA) 
+
+  plot(expand.grid(x = c(1:24), y = c(1:16)),main="sum ERCC/sum non ERCC reads",ylab=NA,xlab=NA)
   points(coordinates,pch=19,col=palette[cut(spike/total,10)]) #plot ERCC reads/non-ERCC reads/cell
   mtext(paste(">10% spike in reads:",round(length(which(spike/total>0.05))/384*100),"%"),col="red",cex=0.9)
-  
+
 }
 
 # plot the top 20 genes with expresion bar and then a CV plot for the same genes
@@ -225,86 +227,86 @@ barplot(log2(rev(cv[1:20])),las=1,cex.names = 0.5, main="top noisy genes",xlab="
 
 #Read files in specified directory automatically (based on Thoms script)
 read_files <- function(dir = "", name = Sys.Date()){
-  
+
   #add "/" to dir
   if(substr(dir, start = nchar(dir), stop = nchar(dir)) != "/" && dir != ""){
     dir <- paste(dir, "/", sep = "")
   }
-  
+
   #Read files
   files <- list.files(dir, "Counts.tsv")
   split <- strsplit(files,split = ".(Barcode|Read|Transcript)Counts")
   file_names <- unique(as.character(data.frame(split, stringsAsFactors = FALSE)[1,]));   # print(file_names)
-  
+
   #This check if all necessary files are in the script
   error <- ""
   for(i in 1:length(file_names)){
-    
+
     if(file.exists(paste(dir, file_names[i],".BarcodeCounts.tsv", sep="")) == FALSE){
       f <- paste(file_names[i], ".BarcodeCounts.tsv", " is not found!", sep = "")
       error <- paste(error, "\n", f)
     }
-    
+
     if(file.exists(paste(dir, file_names[i],".ReadCounts.tsv", sep="")) == FALSE){
       f <- paste(file_names[i], ".ReadCounts.tsv", " is not found!", sep = "")
       error <- paste(error, "\n", f)
     }
-    
+
     if(file.exists(paste(dir,file_names[i],".TranscriptCounts.tsv", sep="")) == FALSE){
       f <- paste(file_names[i], ".TranscriptCounts.tsv", " is not found!", sep = "")
       error <- paste(error, "\n", f)
     }
   }
-  
+
   if(error != ""){
     stop(error)
   }
   cat("the following plates will be processed:\n")
   print(file_names)
-  
+
   output <- paste(dir,file_names, sep="")
   return(output)
 }
 
 # #Read files in specified directory automatically (based on Thoms script)
 # read_files.Original <- function(dir = "", name = Sys.Date()){
-# 
+#
 #   #add "/" to dir
 #   if(substr(dir, start = nchar(dir), stop = nchar(dir)) != "/" && dir != ""){
 #     dir <- paste(dir, "/", sep = "")
 #   }
-# 
+#
 #   #Read files
 #   files <- list.files(dir, ".cout(t|b|c).csv")
 #   split <- strsplit(files,split = ".cout")
 #   file_names <- unique(as.character(data.frame(split, stringsAsFactors = FALSE)[1,]))
-# 
+#
 #   #This check if all necessary files are in the script
 #   error <- ""
 #   for(i in 1:length(file_names)){
-# 
+#
 #     if(file.exists(paste(dir, file_names[i],".coutb.csv", sep="")) == FALSE){
 #       f <- paste(file_names[i], ".coutb.csv", " is not found!", sep = "")
 #       error <- paste(error, "\n", f)
 #     }
-# 
+#
 #     if(file.exists(paste(dir, file_names[i],".coutc.csv", sep="")) == FALSE){
 #       f <- paste(file_names[i], ".coutc.csv", " is not found!", sep = "")
 #       error <- paste(error, "\n", f)
 #     }
-# 
+#
 #     if(file.exists(paste(dir,file_names[i],".coutt.csv", sep="")) == FALSE){
 #       f <- paste(file_names[i], ".coutt.csv", " is not found!", sep = "")
 #       error <- paste(error, "\n", f)
 #     }
 #   }
-# 
+#
 #   if(error != ""){
 #     stop(error)
 #   }
 #   cat("the following plates will be processed:\n")
 #   print(file_names)
-# 
+#
 #   output <- paste(dir,file_names, sep="")
 #   return(output)
 # }
@@ -369,7 +371,7 @@ leakygenes<-function(data){
 #   # determine top expressed genes in corner and compare to mean expressed genes in plate
 #   if( length(which(spike.corner > 75)) == 0){
 #     stop(paste("There are no samples with more than 75 ERCC reads in", names[[i]]))
-#   }  
+#   }
 #   cornerz<-corner[which(spike.corner>75)]  # take only wells which worked (>75 ERCC reads)
 #   cornerz<-rmspike(cornerz) # remove ERCCs
 #   mean.corner<-apply(cornerz,1,sum)[order(apply(cornerz,1,sum),decreasing=TRUE)][1:50] # pick top 50 in corner
