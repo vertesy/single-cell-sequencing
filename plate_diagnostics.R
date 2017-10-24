@@ -10,7 +10,8 @@
 
 # Setup ------------------------------------------------
 
-InputDir = "/Users/abelvertesy/Google_Drive/Avano/INT/Data/INT07/"
+InputDir = "/Users/abelvertesy/Google_Drive/Avano/INT/Data/INT02/"
+# InputDir = "/Users/abelvertesy/Google_Drive/Avano/INT/Data/INT04_6_8_9/"
 # InputDir = "~/Google_Drive/Avano/HPE/Data/hpe2/mRNA/count_files/"
 if(exists("InputDir")) print (InputDir) else {print("Define the variable InputDir before running this script"); stop()}
 MergedOutFile = paste0(InputDir,"TranscriptCounts.Merged.tsv")
@@ -21,7 +22,9 @@ MergedOutFile = paste0(InputDir,"TranscriptCounts.Merged.tsv")
 source ('~/Github_repos/TheCorvinas/R/CodeAndRoll.R')
 
 # source("https://raw.githubusercontent.com/vertesy/single-cell-sequencing/master/plate_diagnostics_functions.R");
-source("~/Github_repos/_Others/scQC_Mauro/plate_diagnostics_functions.R")
+# source("~/Github_repos/_Others/scQC_Mauro/plate_diagnostics_functions.R")
+source("~/Github_repos/_Others/scQC_Mauro/plate_diagnostics_functions.4JC.R")
+
 irequire(RColorBrewer)
 irequire(oce)
 
@@ -29,7 +32,8 @@ MergeAndWriteOut = F #### merge and write multiple dataframes into one .tsv
 
 # specify the location of your empty wells (follows primer number order)
 # if you don't have empty wells just specify O21-O24 and P21-P24.
-emptywells<-c(357:360,381:384) # this corresponds to O21-O24 and P21-P24
+# emptywells<-c(357:360,381:384) # this corresponds to O21-O24 and P21-P24
+emptywells<-c(200:210) # this corresponds to O21-O24 and P21-P24
 
 
 #variables for the script
@@ -55,9 +59,9 @@ for(i in 1:length(files)){
   names[[i]] <-  sub("\\_.*","",split_files[[i]]) # split lib name to keep only name supplied by you to cuppen group
   cat("\n",split_files[[i]],"was renamed to",names[[i]],"\n",sep = " ") # fyi how the libraries will be named
   cat("reading .cout files for plate",i, "out of", length(files),"\n",sep = " ") # reports progress
-  tc[[i]] <- read.csv(paste(files[i],".TranscriptCounts.tsv.gz", sep=""), header = TRUE, sep = "\t",row.names =1)
-  rc[[i]] <- read.csv(paste(files[i],".ReadCounts.tsv.gz", sep=""), header = TRUE, sep = "\t",row.names =1)
-  bc[[i]] <- read.csv(paste(files[i],".BarcodeCounts.tsv.gz", sep=""), header = TRUE, sep = "\t",row.names =1)
+  tc[[i]] <- read.csv(paste(files[i],".coutt.csv.gz", sep=""), header = TRUE, sep = "\t",row.names =1)
+  rc[[i]] <- read.csv(paste(files[i],".coutc.csv.gz", sep=""), header = TRUE, sep = "\t",row.names =1)
+  bc[[i]] <- read.csv(paste(files[i],".coutb.csv.gz", sep=""), header = TRUE, sep = "\t",row.names =1)
   cat("library",names[[i]],"contains a total of",nrow(tc[[i]]),"genes") # reports number of genes found in each library
 }
 
