@@ -10,8 +10,8 @@
 
 # Setup ------------------------------------------------
 
-InputDir = "/Users/abelvertesy/Google_Drive/Avano/INT/Data/INT02/"
-# InputDir = "/Users/abelvertesy/Google_Drive/Avano/INT/Data/INT04_6_8_9/"
+InputDir = "~/Google_Drive/Avano/INT/Data/INT02/"
+# InputDir = "~/Google_Drive/Avano/INT/Data/INT04_6_8_9/"
 # InputDir = "~/Google_Drive/Avano/HPE/Data/hpe2/mRNA/count_files/"
 if(exists("InputDir")) print (InputDir) else {print("Define the variable InputDir before running this script"); stop()}
 MergedOutFile = paste0(InputDir,"TranscriptCounts.Merged.tsv")
