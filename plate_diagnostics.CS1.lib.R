@@ -24,7 +24,7 @@ setwd(InputDir)
 
 ####install/load packages and variables####
 # install.packages("oce") # install this package upon first use
-# source("https://raw.githubusercontent.com/vertesy/TheCorvinas/master/R/CodeAndRoll.R")
+# source("https://raw.githubusercontent.com/vertesy/CodeAndRoll/master/CodeAndRoll.R")
 source ('~/Github_repos/TheCorvinas/R/CodeAndRoll.R')
 # source("https://raw.githubusercontent.com/vertesy/single-cell-sequencing/master/plate_diagnostics_functions.R");
 source("~/Github_repos/_Others/scQC_Mauro/plate_diagnostics_functions.R")
